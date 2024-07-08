@@ -22,11 +22,15 @@ options(repr.plot.height=4,repr.plot.width=6,repr.plot.res = 300)
     ```
 
 ```{r}
-airbnb <- airbnb[,c('City','Room.Type','Neighbourhood','Accommodates','Bathrooms','Bedrooms','Beds','Price','Square.Feet','Guests.Included','Extra.People','Review.Scores.Rating','Latitude', 'Longitude')]
-  filter(Room.Type== "Entire home/apt" & City == 'Madrid' & 'Neighbourhood' != '') %>%
-    select(-c("Type_of_Room", 'City')) |>
+#Creamos el dataframe con los valores serleccionados(columnas)
+df_madrid <- airbnb %>% 
+select(c('City','Room.Type','Neighbourhood','Accommodates','Bathrooms','Bedrooms','Beds','Price','Square.Feet','Guests.Included','Extra.People','Review.Scores.Rating','Latitude', 'Longitude')) |>
+  #Filtramos por los valores seleccionados
+  filter(Room.Type=="Entire home/apt" & City=='Madrid' & Neighbourhood!='') |> 
+  #Eliminamos estas dos columnas que van a ser comunes en el dataframe:
+    select(-c("Room.Type",'City')) |>
+  #Eliminamos lo valores que hemos filtrado y ya no vamos a usar
     droplevels()
-str(airbnb)
 ```
 
 ------------------------------------------------------------------------
@@ -34,7 +38,7 @@ str(airbnb)
 2.  Crea una nueva columna llamada Square.Meters a partir de Square.Feet. Recuerda que un pie cuadrado son 0.092903 metros cuadrados.
 
 ```{r}
-# Creamos una nueva columna llamada Square.Meters y eliminar Square.Feet
+# Creamos una nueva columna llamada Square.Meters y eliminamos Square.Feet
 df_madrid <- df_madrid |> mutate(Square.Meters=Square.Feet*0.092903) |>
   select(-c("Square.Feet"))
 df_madrid
@@ -342,7 +346,7 @@ print(resultados_train)
 
     -   Valor: 0.7133529
 
-    -    El valor de R² indica que aproximadamente el 71.34% de la variabilidad en los metros cuadrados (Square Meters) se explica por el modelo. Esto sugiere que el modelo tiene un buen ajuste, pero hay un 28.66% de variabilidad que no se explica por el modelo.
+    -   El valor de R² indica que aproximadamente el 71.34% de la variabilidad en los metros cuadrados (Square Meters) se explica por el modelo. Esto sugiere que el modelo tiene un buen ajuste, pero hay un 28.66% de variabilidad que no se explica por el modelo.
 
 3.  **MAE (Mean Absolute Error)**:
 
@@ -462,7 +466,7 @@ names(df_madrid)
 
 #Unr df_barrios para obtener el identificador de barrio en df_madrid
 df_madrid_completo <- df_madrid %>%
-  inner_join(df_barrios, by = c("Neighbourhood"="names"))
+  inner_join(df_barrios, by = c("Neighbourhood"="Neighbourhood"))
 
 # Predecir los valores de Square.meters para los casos con NA
 predicciones <- predict(modelo, df_madrid_completo[is.na(df_madrid_completo$Square.Meters), ])
